@@ -253,7 +253,8 @@ open class ZLCustomCamera: UIViewController, CAAnimationDelegate {
         AVCaptureDevice.requestAccess(for: .video) { videoGranted in
             guard videoGranted else {
                 ZLMainAsync(after: 1) {
-                    self.showAlertAndDismissAfterDoneAction(message: String(format: localLanguageTextValue(.noCameraAuthority), getAppName()), type: .camera)
+                    self.showCameraAuthoriedGuidAlert()
+//                     self.showAlertAndDismissAfterDoneAction(message: String(format: localLanguageTextValue(.noCameraAuthority), getAppName()), type: .camera)
                 }
                 return
             }
@@ -594,7 +595,19 @@ open class ZLCustomCamera: UIViewController, CAAnimationDelegate {
         }
         showAlertController(title: nil, message: message, style: .alert, actions: [action], sender: self)
     }
-    
+       private func showCameraAuthoriedGuidAlert() {
+        let continueAction = ZLCustomAlertAction(title: "Cancel", style: .default, handler: nil)
+        let gotoSettingsAction = ZLCustomAlertAction(title: "Settings", style: .default) { _ in
+            guard let url = URL(string: UIApplication.openSettingsURLString) else {
+                return
+            }
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+        showAlertController(title: nil, message: "Go to settings to enable camera roll access.", style: .alert, actions: [continueAction, gotoSettingsAction], sender: self)
+    }
+ 
     private func showTipsLabel(animate: Bool) {
         tipsLabel.layer.removeAllAnimations()
         if animate {
